@@ -5,7 +5,7 @@ addpath("result");  % 添加结果目录
 load('type_1_SNR.mat');  % 单像素结构
 load('type_2_SNR.mat');  % 1x2宏像素结构
 load('type_3_SNR.mat');  % 2x2宏像素结构
-load('type_4_SNR.mat');  % 3x3宏像素结构
+load('type_4_SNR.mat');  % 2x4宏像素结构
 
 %% 设置参数
 ambientLight = [0, 10, 40, 70];  % 背景光照水平 (klux)
@@ -39,7 +39,8 @@ for k = 1:length(ambientLight)
     lineStyles = {'-', '--', ':', '-.'};  % 不同的线型
     
     %% 1. 绘制单像素结构（水平线）
-    singlePixelData = repmat(SNR_SinglePixel(k), size(winSize));
+    singlePixelData = zeros(1, length(winSize));
+    singlePixelData(1) = SNR_SinglePixel(k);singlePixelData(2:4) = nan;
     h1 = plot(winSize, singlePixelData, ...
               'Marker', markerTypes{1}, 'MarkerSize', 6, 'Color', [0 0 0], ...
               'LineWidth', 1.5, 'LineStyle', '-');
@@ -82,11 +83,11 @@ for k = 1:length(ambientLight)
         end
     end
     
-    %% 4. 绘制3x3宏像素结构
-    configCount = size(SNR_33MacroPixel, 2);
+    %% 4. 绘制2x4宏像素结构
+    configCount = size(SNR_24MacroPixel, 2);
     colors = jet(configCount); 
     for config = 1:configCount
-        yData = squeeze(SNR_33MacroPixel(k, config, :));
+        yData = squeeze(SNR_24MacroPixel(k, config, :));
         h4 = plot(winSize, yData, ...
                   'Marker', markerTypes{4}, 'MarkerSize', 5, 'Color', colors(config, :), ...
                   'LineWidth', 1.5, 'LineStyle', lineStyles{3});
@@ -94,14 +95,14 @@ for k = 1:length(ambientLight)
         % 只在第一次循环时记录图例句柄
         if k == 1
             legendHandles = [legendHandles, h4];
-            legendLabels{end+1} = sprintf('3x3 (th=%d)', config);
+            legendLabels{end+1} = sprintf('2x4 (th=%d)', config);
         end
     end
     
     %% 子图美化
     title(sprintf('(%c)Ambient Light:%d klux', 96+k, ambientLight(k)), 'FontSize', 12, 'FontWeight', 'bold');
-    xlabel('Window Size/bins', 'FontSize', 10);
-    ylabel('SNR', 'FontSize', 10);
+    xlabel('Window Size/bins', 'FontSize', 10, 'FontWeight', 'bold');
+    ylabel('SNR', 'FontSize', 10, 'FontWeight', 'bold');
     
     % 设置坐标轴
     xticks(winSize);
@@ -119,7 +120,7 @@ sgtitle('Signal-to-Noise Ratio Performance at Different Ambient Light Levels', .
 
 %% 添加统一图例
 % 计算图例位置（整个图形的右上角）
-legendPos = [0.91, 0.68, 0.08, 0.2];  % [left, bottom, width, height]
+legendPos = [0.91, 0.38, 0.08, 0.2];  % [left, bottom, width, height]
 
 % 创建图例
 hLegend = legend(legendHandles, legendLabels, ...

@@ -1,4 +1,4 @@
-function countsHistogram = SinglePixelSimulation(L_target, gateStartBin, TDCtype, NOISE, para, physConst, env)
+function countsHistogram = SinglePixelSimulation(L_target, gateStartBin, para, physConst, env)
 
     %% 时间门配置
     gateDurationBins = single(para.rx.gateDuration/para.rx.TDC_res);
@@ -13,11 +13,7 @@ function countsHistogram = SinglePixelSimulation(L_target, gateStartBin, TDCtype
     parfor i = 1:numActiveBins
         t_current = activeBins(i);
         [N_signal, N_background] = photonCalculations(L_target, t_current, para, physConst, env);
-        if NOISE == 1
-            N_values(i) = (N_signal + N_background) * para.rx.PDE + para.rx.DCR * bin_sec;
-        else
-            N_values(i) = N_signal * para.rx.PDE + para.rx.DCR * bin_sec;
-        end
+        N_values(i) = (N_signal + N_background) * para.rx.PDE + para.rx.DCR * bin_sec;
     end
     
     %% 蒙特卡洛模拟
@@ -37,9 +33,7 @@ function countsHistogram = SinglePixelSimulation(L_target, gateStartBin, TDCtype
                 dead_end = min(binIdx + dead_bins - 1, numActiveBins);
                 dead_flags(dead_start:dead_end) = true;
                 % 只记录一次光子事件
-                if TDCtype == 0
-                    break;
-                end
+                break;
             end
         end
         countsHistogram = countsHistogram + single_counts;

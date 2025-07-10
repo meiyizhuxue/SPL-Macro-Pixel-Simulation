@@ -1,5 +1,5 @@
-function countsHistogram = MacroPixelSimulation(L_target, gateStartBin, TDCtype, ...
-                                                NOISE, coincidenceThreshold, coincidenceTime, ...
+function countsHistogram = MacroPixelSimulation(L_target, gateStartBin, ...
+                                                coincidenceThreshold, coincidenceTime, ...
                                                 para, physConst, env)
 
     %% 时间门配置
@@ -16,11 +16,7 @@ function countsHistogram = MacroPixelSimulation(L_target, gateStartBin, TDCtype,
     parfor binIdx = 1:numActiveBins
         t_current = activeBins(binIdx);
         [N_signal, N_background] = photonCalculations(L_target, t_current, para, physConst, env);
-        if NOISE == 1
-            N_values(binIdx) = (N_signal + N_background) * para.rx.PDE + para.rx.DCR * bin_sec;
-        else
-            N_values(binIdx) = N_signal * para.rx.PDE + para.rx.DCR * bin_sec;
-        end
+        N_values(binIdx) = (N_signal + N_background) * para.rx.PDE + para.rx.DCR * bin_sec;
     end
     
     %% 蒙特卡洛模拟
@@ -54,9 +50,7 @@ function countsHistogram = MacroPixelSimulation(L_target, gateStartBin, TDCtype,
             if  window >= 1
                 if counts >= coincidenceThreshold
                     single_countsHistogram(binIdx_1) = 1;
-                    if TDCtype == 0
-                        break;  % 单次触发机制
-                    end
+                    break;  % 单次触发机制
                 else
                     binIdx_1 = binIdx_1 + coincidenceTime;
                 end

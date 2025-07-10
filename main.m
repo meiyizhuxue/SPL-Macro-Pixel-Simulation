@@ -16,5 +16,5 @@ type2_12MacroPixel;
 %% 第三种类型：2*2宏像素
 type3_22MacroPixel;
 
-%% 第四种类型：3*3宏像素
-type4_33MacroPixel;
+%% 第四种类型：2*4宏像素
+type4_24MacroPixel;
